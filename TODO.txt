@@ -1,0 +1,20 @@
+SYSTEM 1: Recorder
+
+
+SYSTEM 2: Animator
+
+Input: 
+	- Audio file
+	- Text with annotations
+		Time annotations: how long do I take to say this sentence
+		Mood annotations -> mood of the sentence
+
+Output:
+	- Video coupled with audio with
+		- mood pictures	 
+
+
+	- Addons later
+		(- mouth moving with audio wave) 
+		(- mood cycling between primitives)
+		(- mood animations)
