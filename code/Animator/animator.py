@@ -2,6 +2,9 @@ import argparse
 import os
 from video_generator import *
 
+DATA_FILES_PATH = "data_files"
+MOOD_IMG_PATH = "mood_images"
+
 def validTrackLine(track_line):
 	if track_line.count("{") != 1: return False
 	if track_line.count("}") != 1: return False
@@ -11,7 +14,8 @@ def validTrackLine(track_line):
 	if parts[0].count("{") != 1 or parts[0][0] != "{": return False
 	if parts[1].count("[") != 1 or parts[1][0] != "[": return False
 	if parts[1].count("]") != 1 or parts[1][-1] != "]": return False
-	delta_time = parts[1][1:-1]
+	if parts[1].count(";") != 1: return False
+	delta_time = parts[1][1:-1].split(";")[0]
 	try:
 		float(delta_time)
 	except ValueError:
@@ -21,12 +25,13 @@ def validTrackLine(track_line):
 def parseTrackLineInfo(track_line):
 	parts = track_line.split("}")
 	text = parts[0][1:]
-	delta_time = float(parts[1][1:-1])
-	return {"text": text, "delta_time": delta_time}
+	tags = parts[1][1:-1].split(";")
+	delta_time = float(tags[0])
+	return {"text": text, "delta_time": delta_time, "mood": tags[1]}
 
 def parseAnnotatedScript(track_name):
 	track_raw = []
-	with open(f"./{track_name}.txt", "r") as reader:
+	with open(f"{DATA_FILES_PATH}/{track_name}.txt", "r") as reader:
 		track_raw = reader.read()
 
 	track_info = []
@@ -53,11 +58,11 @@ def parseTrackNameFromArguments():
 	args = parser.parse_args()
 	track_name = args.track_name
 
-	if not os.path.exists(f"./{track_name}.txt"):
-		print(f"Annotated text file ./{track_name}.txt does not exist")
+	if not os.path.exists(f"{DATA_FILES_PATH}/{track_name}.txt"):
+		print(f"Annotated text file \"{DATA_FILES_PATH}/{track_name}.txt\" does not exist")
 		return None
-	if not os.path.exists(f"./{track_name}.aac"):
-		print(f"Audio file ./{track_name}.aac does not exist")
+	if not os.path.exists(f"{DATA_FILES_PATH}/{track_name}.aac"):
+		print(f"Audio file \"{DATA_FILES_PATH}/{track_name}.aac\" does not exist")
 		return None
 
 	return track_name 
@@ -71,7 +76,7 @@ def main():
 	print(f"Starting animator on track: {track_name}")
 	track_info = parseAnnotatedScript(track_name)
 	
-	video_generator = VideoGenerator(track_name, track_info)
+	video_generator = VideoGenerator(track_name, track_info, MOOD_IMG_PATH, DATA_FILES_PATH)
 	video_generator.generateVideo() 
 
 if __name__ == "__main__":

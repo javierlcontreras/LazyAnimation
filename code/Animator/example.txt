@@ -1,6 +1,0 @@
-{Hola}[1.59]
-{Som el Javier i l’Anna,}[1.23]
-{del grau de matemàtiques de la FME.}[1.55]
-{Hem volgut aprofitar aquesta oportunitat per ensenyarvos un dels nostres problemes preferits.}[4.30]
-{Aquest problema ens agrada perquè té una solució molt elegant i molt fàcil d’entendre}[4.17]
-{però que no es gens fàcil de deduir.}[2.01]
