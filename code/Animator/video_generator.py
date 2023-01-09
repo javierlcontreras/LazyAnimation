@@ -18,7 +18,7 @@ class VideoGenerator:
 		annotated_script_parser = AnnotatedScriptParser(self.track_path)
 		self.track_info = annotated_script_parser.parseAnnotatedScript()
 		
-		self.animation_engine = AnimationEngine(MOOD_IMG_PATH, FPS, WIDTH, HEIGHT)
+		self.animation_engine = AnimationEngine(track_path, MOOD_IMG_PATH, FPS, WIDTH, HEIGHT)
 
 		self.track_audio_path = f"{track_path}.aac"
 		self.output_video_path = f"{track_path}.mp4"

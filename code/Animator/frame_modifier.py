@@ -2,29 +2,20 @@ import cv2
 from PIL import ImageFont, ImageDraw, Image
 import glob
 import numpy as np
-
+from audio_to_mouth import *
 
 class FrameModifier:
-	def __init__(self, MOOD_IMG_PATH, WIDTH, HEIGHT):
+	def __init__(self, track_path, MOOD_IMG_PATH, WIDTH, HEIGHT):
 		self.MOOD_IMG_PATH = MOOD_IMG_PATH
 		self.WIDTH = WIDTH
 		self.HEIGHT = HEIGHT
+		
+		self.audio_to_mouth = AudioToMouth(track_path, WIDTH, HEIGHT)
 
-	def addTrackLineToVideo(self, track_info_line):
-		mood = track_info_line["mood"]
-		delta_time = track_info_line["delta_time"]
-		frames_of_track_line = int(delta_time * self.FPS + 0.5)
 
-		for frame_it in range(frames_of_track_line):
-			frame_time = init_time + frame_it / self.FPS
-			frame = self.frame_modifier.getFrame(mood, init_time, delta_time, frame_time)
-			video.write(frame)
-
-	def getFrame(self, mood, init_time, delta_time, frame_time):
-		background_path = glob.glob(f"{self.MOOD_IMG_PATH}/{mood}/*")[0]
-		background = cv2.imread(background_path)
-		background = self.imageResize(background, self.WIDTH, self.HEIGHT)			
-		return background
+	def getFrame(self, background, frame_time):
+		frame_with_mouth = self.audio_to_mouth.addMouth(background, frame_time)			
+		return frame_with_mouth
 
 	def imageResize(self, img, W, H):
 		(h, w, c) = np.shape(img)
