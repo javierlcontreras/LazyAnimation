@@ -7,7 +7,7 @@ from PIL import ImageFont, ImageDraw, Image
 
 class AudioToMouth:
 	def __init__(self, track_path, WIDTH, HEIGHT):
-		self.AVERAGING_WINDOW_SECONDS = 0.1
+		self.AVERAGING_WINDOW_SECONDS = 0.3
 		self.WIDTH = WIDTH
 		self.HEIGHT = HEIGHT
 		self.audio_raw, self.audio_FPS, self.audio_max = self.extractAudioRaw(track_path)
@@ -62,5 +62,6 @@ class AudioToMouth:
 			(w + r, h + r)
 		]
 		pillow_image_draw.ellipse(corners, fill=(0,0,0,255))
-		cv2_mouthed_image = cv2.cvtColor(np.array(pillow_image), cv2.COLOR_RGB2BGR)  
+		# cv2.cvtColor(..., code): code is 0 for RGB2GBR and 1 for RGB2RGB 
+		cv2_mouthed_image = cv2.cvtColor(np.array(pillow_image), 1)  
 		return cv2_mouthed_image
