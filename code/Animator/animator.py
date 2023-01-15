@@ -2,7 +2,11 @@ import argparse
 import os
 from video_generator import *
 
-MOOD_IMG_PATH = "mood_images"
+ART_PATHS = {
+	"POSES": "art/poses",
+	"FONTS": "art/fonts",
+	"MOUTHS": "art/mouths"
+}
 
 def parseTrackPathFromArguments():
 	parser = argparse.ArgumentParser(description='Annotated text to Animation')
@@ -30,7 +34,7 @@ def main():
 
 	print(f"Starting animator on track: {track_path}")
 
-	video_generator = VideoGenerator(track_path, MOOD_IMG_PATH)
+	video_generator = VideoGenerator(track_path, ART_PATHS)
 	video_generator.generateVideo() 
 
 if __name__ == "__main__":

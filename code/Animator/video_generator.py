@@ -7,18 +7,18 @@ import os
 
 
 class VideoGenerator:
-	def __init__(self, track_path, MOOD_IMG_PATH,
+	def __init__(self, track_path, ART_PATHS,
 					FPS = 60, WIDTH = 1920, HEIGHT = 1080): 
 		self.FPS = FPS
 		self.WIDTH = WIDTH
 		self.HEIGHT = HEIGHT
-		self.MOOD_IMG_PATH = MOOD_IMG_PATH
+		self.ART_PATHS = ART_PATHS
 
 		self.track_path = track_path
 		annotated_script_parser = AnnotatedScriptParser(self.track_path)
 		self.track_info = annotated_script_parser.parseAnnotatedScript()
 		
-		self.animation_engine = AnimationEngine(track_path, MOOD_IMG_PATH, FPS, WIDTH, HEIGHT)
+		self.animation_engine = AnimationEngine(track_path, ART_PATHS, FPS, WIDTH, HEIGHT)
 
 		self.track_audio_path = f"{track_path}.aac"
 		self.output_video_path = f"{track_path}.mp4"

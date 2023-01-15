@@ -3,21 +3,21 @@ class AnnotatedScriptParser:
 		self.track_path = track_path
 
 	def validTrackLine(self, track_line):
-		if track_line.count("{") != 1: return False
-		if track_line.count("}") != 1: return False
-		if track_line.count("[") != 1: return False
-		if track_line.count("]") != 1: return False
+		if track_line.count("{") != 1: return ">{"
+		if track_line.count("}") != 1: return ">}"
+		if track_line.count("[") != 1: return ">["
+		if track_line.count("]") != 1: return ">]"
 		parts = track_line.split("}")
-		if parts[0].count("{") != 1 or parts[0][0] != "{": return False
-		if parts[1].count("[") != 1 or parts[1][0] != "[": return False
-		if parts[1].count("]") != 1 or parts[1][-1] != "]": return False
-		if parts[1].count(";") != 1: return False
+		if parts[0].count("{") != 1 or parts[0][0] != "{": return "{ incorrect in part 1"
+		if parts[1].count("[") != 1 or parts[1][0] != "[": return "[ incorrect in part 2"
+		if parts[1].count("]") != 1 or parts[1][-1] != "]": return "] incorrect in part 2"
+		if parts[1].count(";") != 1: return "; incorrect in part 2"
 		delta_time = parts[1][1:-1].split(";")[0]
 		try:
 			float(delta_time)
 		except ValueError:
-			return False
-		return True
+			return "float error in part 2"
+		return ""
 
 	def parseTrackLineInfo(self, track_line):
 		parts = track_line.split("}")
@@ -37,8 +37,10 @@ class AnnotatedScriptParser:
 			track_lines = track_lines[:-1]
 		for track_line in track_lines:
 			track_line = track_line.strip(" ")
-			if not self.validTrackLine(track_line):
-				print(f"Invalid line {track_line}, skipping it")
+			err = self.validTrackLine(track_line)
+			if err != "":
+				print(f"Invalid line {track_line} with error {err}, skipping it")
+				print("Valid format is {text}[time;mood]")
 				continue
 			track_line_info = self.parseTrackLineInfo(track_line)
 			track_info.append(track_line_info)
