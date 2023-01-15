@@ -55,10 +55,8 @@ phoneme2mouth = {
 }
 
 class AudioToMouth:
-	def __init__(self, track_path, docker_url, ART_PATHS, WIDTH, HEIGHT):
+	def __init__(self, track_path, docker_url, ART_PATHS):
 		self.AVERAGING_WINDOW_SECONDS = 0.3
-		self.WIDTH = WIDTH
-		self.HEIGHT = HEIGHT
 		self.ART_PATHS = ART_PATHS
 		
 		self.docker_url = docker_url
@@ -110,61 +108,17 @@ class AudioToMouth:
 
 		print(phoneme_list)
 		return phoneme_list
-	'''
-	def _extractAudioRaw(self, track_path):
-		sound = AudioSegment.from_file(f"{track_path}.aac", "aac")
-		#sound = sound.set_frame_rate(60)
-		bit_depth = sound.sample_width * 8
-		array_type = get_array_type(bit_depth)
-		audio_raw_array = array.array(array_type, sound.raw_data)
-		audio_raw = list(audio_raw_array)
-		len_audio_raw = len(audio_raw)
-		audio_raw_left = [audio_raw[i] for i in range(0, len_audio_raw, 2)]
-		audio_FPS = sound.frame_rate
-		audio_max = 0
-		for audio_sample in audio_raw:
-			audio_max = max(audio_max, abs(audio_sample))
-		return audio_raw, audio_FPS, audio_max
-
-	def _getOpennessLevel(self, frame_time):
-		start_time = frame_time - self.AVERAGING_WINDOW_SECONDS / 2
-		end_time = frame_time + self.AVERAGING_WINDOW_SECONDS / 2
-		len_audio_raw = len(self.audio_raw)
-		start_frame = max(0, int(start_time * self.audio_FPS))
-		end_frame = min(len_audio_raw, int(end_time * self.audio_FPS))
-	
-		count = 0
-		audio_sample = 0
-		for audio_frame in range(start_frame, end_frame):
-			audio_sample += abs(self.audio_raw[audio_frame]) / self.audio_max
-			count += 1
-		return audio_sample / count
-
-	def _addCircleMouth(self, openness, image):
-		pillow_image = Image.fromarray(image)
-
-		pillow_image_draw = ImageDraw.Draw(pillow_image)
-		r = 300*openness
-		w = self.WIDTH / 2
-		h = self.HEIGHT / 2
-		corners = [
-			(w - r, h - r),
-			(w + r, h + r)
-		]
-		pillow_image_draw.ellipse(corners, fill=(0,0,0,255))
-		# cv2.cvtColor(..., code): code is 0 for RGB2GBR and 1 for RGB2RGB 
-		cv2_mouthed_image = cv2.cvtColor(np.array(pillow_image), 1)  
-		return cv2_mouthed_image
-	'''
 
 	def _addMouthImage(self, image, phoneme):
-		pillow_mouth = Image.open(f"{self.ART_PATHS['MOUTHS']}/{phoneme}.png")
-		pillow_image = Image.fromarray(image)
+		pillow_mouth = Image.open(f"{self.ART_PATHS['MOUTHS']}/{phoneme}.png").convert('RGBA')
+		pillow_empty = Image.new("RGBA",image.size)
+		(W, H) = image.size
+		(w, h) = pillow_mouth.size
+		position = (W//2 - w//2, H//2 - h//2)
+		pillow_empty.paste(pillow_mouth, position,mask=pillow_mouth)
+		image = Image.alpha_composite(image, pillow_empty)
 
-		pillow_image.paste(pillow_mouth, (self.WIDTH//2, self.HEIGHT//2))
-
-		cv2_mouthed_image = cv2.cvtColor(np.array(pillow_image), 1)  
-		return cv2_mouthed_image
+		return image
 
 	def addMouth(self, image, frame_time):
 		#audio_frame = int(frame_time * self.audio_FPS)
