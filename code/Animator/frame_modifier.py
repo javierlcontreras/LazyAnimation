@@ -5,16 +5,17 @@ import numpy as np
 from audio_to_mouth import *
 
 class FrameModifier:
-	def __init__(self, track_path, ART_PATHS, WIDTH, HEIGHT):
+	def __init__(self, track_path, docker_url, ART_PATHS, WIDTH, HEIGHT):
 		self.ART_PATHS = ART_PATHS
 		self.WIDTH = WIDTH
 		self.HEIGHT = HEIGHT
-		
-		self.audio_to_mouth = AudioToMouth(track_path, WIDTH, HEIGHT)
+
+		self.docker_url = docker_url
+		self.audio_to_mouth = AudioToMouth(track_path, docker_url, ART_PATHS, WIDTH, HEIGHT)
 
 	def getFrame(self, background, frame_time):
-		frame_with_mouth, phoneme = self.audio_to_mouth.addMouth(background, frame_time)			
-		return self._writeTextOnImage(frame_with_mouth, phoneme, self.WIDTH, self.HEIGHT)
+		frame_with_mouth = self.audio_to_mouth.addMouth(background, frame_time)			
+		return frame_with_mouth
 
 	def _writeTextOnImage(self, img, word, W, H):
 		fontsize = 200

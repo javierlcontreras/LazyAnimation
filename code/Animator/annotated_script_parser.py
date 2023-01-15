@@ -45,3 +45,9 @@ class AnnotatedScriptParser:
 			track_line_info = self.parseTrackLineInfo(track_line)
 			track_info.append(track_line_info)
 		return track_info
+
+
+	def unnanotateAndSaveScriptForGentle(self, track_info):
+		with open(f"{self.track_path}_gentle.txt", "w") as writer:
+			for track_info_line in track_info:
+				writer.write(track_info_line["text"] + "\n") 

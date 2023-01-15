@@ -7,7 +7,7 @@ import os
 
 
 class VideoGenerator:
-	def __init__(self, track_path, ART_PATHS,
+	def __init__(self, track_path, docker_url, ART_PATHS,
 					FPS = 60, WIDTH = 1920, HEIGHT = 1080): 
 		self.FPS = FPS
 		self.WIDTH = WIDTH
@@ -15,10 +15,13 @@ class VideoGenerator:
 		self.ART_PATHS = ART_PATHS
 
 		self.track_path = track_path
+		self.docker_url = docker_url
+
 		annotated_script_parser = AnnotatedScriptParser(self.track_path)
 		self.track_info = annotated_script_parser.parseAnnotatedScript()
+		annotated_script_parser.unnanotateAndSaveScriptForGentle(self.track_info)
 		
-		self.animation_engine = AnimationEngine(track_path, ART_PATHS, FPS, WIDTH, HEIGHT)
+		self.animation_engine = AnimationEngine(track_path, docker_url, ART_PATHS, FPS, WIDTH, HEIGHT)
 
 		self.track_audio_path = f"{track_path}.aac"
 		self.output_video_path = f"{track_path}.mp4"
