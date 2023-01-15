@@ -1,6 +1,10 @@
 from os import environ, path
 
 from pocketsphinx import *
+import wave
+from pydub import AudioSegment
+from pydub.utils import get_array_type
+import array
 
 MODELDIR = get_model_path()
 
@@ -20,14 +24,16 @@ config.set_float('-pbeam', 1e-20)
 decoder = Decoder(config)
 
 decoder.start_utt()
-stream = open(path.join(DATADIR, 'example.raw'), 'rb')
+#stream = open(path.join(DATADIR, 'example.raw'), 'rb')
 
-while True:
-  buf = stream.read(1024)
-  if buf:
-    decoder.process_raw(buf, False, False)
-  else:
-    break
+sound = AudioSegment.from_file("example.aac", "aac") 
+a = 0
+for segment in sound:
+	a += 1
+	decoder.process_raw(segment.raw_data, False, False)
+print(a)
+print()
+
 decoder.end_utt()
 
 hypothesis = decoder.hyp()
