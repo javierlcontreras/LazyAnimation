@@ -10,15 +10,9 @@ from PIL import ImageFont, ImageDraw, Image
 import requests
 
 class AudioToMouth:
-	def __init__(self, track_path, docker_url, schedule, ART_PATHS, LAZYKH_IMAGE_INDEXING):
+	def __init__(self, ART_PATHS, LAZYKH_IMAGE_INDEXING):
 		self.ART_PATHS = ART_PATHS
-		
-		self.docker_url = docker_url
-		self.LAZYKH_IMAGE_INDEXING = LAZYKH_IMAGE_INDEXING
-
-		self.phoneme_list = schedule["PHONEMES"]
-		self.current_phoneme = 0
-	
+		self.LAZYKH_IMAGE_INDEXING = LAZYKH_IMAGE_INDEXING	
 
 	def _phonemeToMouthImagePath(self, phoneme, mood):
 		index = self.LAZYKH_IMAGE_INDEXING["MOUTH_TO_INDEX"][phoneme]
@@ -38,13 +32,7 @@ class AudioToMouth:
 
 		return image
 
-	def addMouth(self, image, frame_time, mood):
-		#audio_frame = int(frame_time * self.audio_FPS)
-		
-		if frame_time > self.phoneme_list[self.current_phoneme]['end_time']: 
-			self.current_phoneme += 1
-			if self.current_phoneme >= len(self.phoneme_list):
-				self.current_phoneme = len(self.phoneme_list)-1
-
-		phoneme = self.phoneme_list[self.current_phoneme]["phoneme"]
+	def addMouth(self, image, frame_info):
+		phoneme = frame_info["phoneme"]
+		mood = frame_info["mood"]
 		return self._addMouthImage(image, mood, phoneme)

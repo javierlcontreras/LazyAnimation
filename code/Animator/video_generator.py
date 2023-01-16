@@ -7,7 +7,6 @@ import tqdm
 import glob
 import os
 
-
 class VideoGenerator:
 	def __init__(self, track_path, docker_url, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING): 
 		self.VIDEO_SETTINGS = VIDEO_SETTINGS
@@ -28,7 +27,7 @@ class VideoGenerator:
 		return track_info
 
 	def _computeSchedule(self, track_info):
-		scheduler = Scheduler(self.audio_track_path, self.docker_url, track_info, self.LAZYKH_IMAGE_INDEXING)
+		scheduler = Scheduler(self.track_path, self.docker_url, track_info, self.VIDEO_SETTINGS, self.LAZYKH_IMAGE_INDEXING)
 		schedule = scheduler.getTimetables()
 		return schedule
 
@@ -36,7 +35,7 @@ class VideoGenerator:
 		track_info = self._parseAnnotatedScript()
 		schedule = self._computeSchedule(track_info)
 
-		animation_engine = AnimationEngine(self.track_path, self.docker_url, schedule, self.ART_PATHS, self.VIDEO_SETTINGS, self.LAZYKH_IMAGE_INDEXING)
+		animation_engine = AnimationEngine(self.ART_PATHS, self.VIDEO_SETTINGS, self.LAZYKH_IMAGE_INDEXING)
 
 		FPS = self.VIDEO_SETTINGS['FPS']
 		WIDTH = self.VIDEO_SETTINGS['WIDTH']
@@ -49,12 +48,14 @@ class VideoGenerator:
 								fourcc, 
 								FPS, 
 								(WIDTH, HEIGHT))
-		init_time = 0
-		for track_info_index, track_info_line in enumerate(tqdm.tqdm(track_info)):
-			delta_time = schedule["TRACK_LINE_DURATIONS"][track_info_index]
-			animation_engine.addTrackLineToVideo(video, track_info_line, init_time, delta_time)
-			init_time += delta_time
-
+		for frame_info in tqdm.tqdm(schedule):
+			frame = animation_engine.getFrame(frame_info)
+			(W, H) = frame.size
+			if W != WIDTH or H != HEIGHT:
+				raise "Recieving frame of inadecuate size for video"
+			cv2_frame= cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)  
+			video.write(cv2_frame)
+			
 		video.release()
 		self.addMusic()
 

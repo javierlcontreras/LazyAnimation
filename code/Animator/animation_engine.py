@@ -1,15 +1,14 @@
-from frame_modifier import *
+from audio_to_mouth import *
 import random
 import tqdm
-
+import glob 
 class AnimationEngine:
-	def __init__(self, track_path, docker_url, schedule, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING):
+	def __init__(self, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING):
 		self.ART_PATHS = ART_PATHS
 		self.VIDEO_SETTINGS = VIDEO_SETTINGS
 		self.LAZYKH_IMAGE_INDEXING = LAZYKH_IMAGE_INDEXING
 
-		self.docker_url = docker_url
-		self.frame_modifier = FrameModifier(track_path, docker_url, schedule, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING)
+		self.audio_to_mouth = AudioToMouth(ART_PATHS, LAZYKH_IMAGE_INDEXING)
 
 	def _emotionToImagePath(self, mood, pose, blinker):
 		index = (5*self.LAZYKH_IMAGE_INDEXING["EMOTION_INDEX"][mood] + pose)*3 + blinker
@@ -21,46 +20,57 @@ class AnimationEngine:
 		return path
 			
 
-	def addTrackLineToVideo(self, video, track_info_line, init_time, delta_time):
-		FPS = self.VIDEO_SETTINGS['FPS']
-		WIDTH = self.VIDEO_SETTINGS['WIDTH']
-		HEIGHT = self.VIDEO_SETTINGS['HEIGHT']
-		BLINKING_ACTION_TIME = self.VIDEO_SETTINGS['BLINKING_ACTION_TIME']
-		BLINKING_SPACE_TIME = self.VIDEO_SETTINGS['BLINKING_SPACE_TIME']
-		
-		mood = track_info_line["mood"]
-		frames_of_track_line = int(delta_time * FPS + 0.5)
-		
-		inter_blink_frames = int(BLINKING_SPACE_TIME * FPS)
-		blinking_frames = int(BLINKING_ACTION_TIME/2 * FPS)
+	def getFrame(self, frame_info):
+		pose_path = self._emotionToImagePath(frame_info["mood"], frame_info["pose"], frame_info["blinker"]) 
+		pose_image = Image.open(pose_path)
+		#WIDTH = self.VIDEO_SETTINGS["WIDTH"]		
+		#HEIGHT = self.VIDEO_SETTINGS["HEIGHT"]		
+		#pose_image_resized = self._imageResize(pose_image, WIDTH, HEIGHT)
 
-		time_to_blink = inter_blink_frames
-		time_since_blink = 1e9
-		blinker = 0
-		
-		pose = random.randint(0,4)
-		for frame_it in tqdm.tqdm(range(frames_of_track_line)):
-			time_since_blink += 1
-			time_to_blink -= 1
-		
-			if time_to_blink == 0:
-				blinker = 1
-				time_since_blink = 0
-			if time_since_blink == blinking_frames:
-				blinker = 2
-			if time_since_blink == 2*blinking_frames:
-				blinker = 0
-				time_to_blink = inter_blink_frames
+		frame_with_mouth = self.audio_to_mouth.addMouth(pose_image, frame_info)
+		return frame_with_mouth
 
-			pose_path = self._emotionToImagePath(mood, pose, blinker) 
-			pose_image = Image.open(pose_path)
-			frame_image = self.frame_modifier.imageResize(pose_image, WIDTH, HEIGHT)
-			
-			frame_time = init_time + frame_it / FPS
-			frame = self.frame_modifier.getFrame(pose_image, frame_time, mood)
-			if random.randint(0, 300) == 0:
-				frame.show()
+	def _writeTextOnImage(self, img, word):
+		(W, H) = img.size
+		fontsize = 200
 
-			cv2_frame= cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)  
-			video.write(cv2_frame)
+		draw = ImageDraw.Draw(img)  
+		color = (0,0,0)
+		
+		while True:
+			font = ImageFont.truetype(f"{self.ART_PATHS['FONTS']}/SODORBld.ttf", fontsize)	
+
+			x1, y1, x2, y2 = draw.textbbox((0,0), word, font=font)
+			w = x2 - x1
+			h = y2 - y1
+			if w > 0.7*W or h > 0.7*H: fontsize -= 1
+			else:
+				break
+
+		draw.text(((W-w)/2,(H-h)/2), word.replace("-", " "), font=font, fill="white", stroke_width=fontsize//10, stroke_fill="black")
+
+		return img
+
+	def _imageResize(self, img, W, H):
+		h, w = img.size
+
+		back = np.zeros((H, W, 3), dtype = "uint8")
+
+		if w/W > h/H:
+			swidth = W
+			sheight = h*W/w
+		else:
+			sheight = H
+			swidth = w*H/h
+		
+		sheight = int(sheight)
+		swidth = int(swidth)
+		img = img.resize((swidth, sheight))
+		
+		pil_back = Image.new("RGBA", (W,H))
+		dx = W//2 - swidth//2
+		dy = H//2 - sheight//2
+		pil_back.paste(img, (dx, dy), mask=img)
+		
+		return pil_back
 		
