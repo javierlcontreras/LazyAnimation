@@ -52,8 +52,8 @@ class Scheduler:
 
 	def _fullAudioDuration(self):
 		sound = AudioSegment.from_file(f"{self.audio_track_path}", "aac")
-		return sound.duration_seconds
-
+		duration = sound.duration_seconds
+		return duration
 
 	def _extractTrackLineDuration(self, json):
 		print(json)

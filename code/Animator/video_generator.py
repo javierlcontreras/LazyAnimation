@@ -48,14 +48,13 @@ class VideoGenerator:
 								FPS, 
 								(WIDTH, HEIGHT))
 		init_time = 0
-		for track_info_index, track_info_line in tqdm.tqdm(enumerate(track_info)):
+		for track_info_index, track_info_line in enumerate(tqdm.tqdm(track_info)):
 			delta_time = schedule["TRACK_LINE_DURATIONS"][track_info_index]
-
 			animation_engine.addTrackLineToVideo(video, track_info_line, init_time, delta_time)
 			init_time += delta_time
 
 		video.release()
-		self.addMusic()
+		#self.addMusic()
 
 	def addMusic(self):
 		os.system(f"ffmpeg -i {self.output_video_path} -i {self.audio_track_path} \

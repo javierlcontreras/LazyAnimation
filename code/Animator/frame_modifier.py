@@ -6,13 +6,16 @@ from audio_to_mouth import *
 
 class FrameModifier:
 	def __init__(self, track_path, docker_url, schedule, ART_PATHS, LAZYKH_IMAGE_INDEXING):
+		self.ART_PATHS = ART_PATHS
 		self.audio_to_mouth = AudioToMouth(track_path, docker_url, schedule, ART_PATHS, LAZYKH_IMAGE_INDEXING)
 
 	def getFrame(self, current_frame, frame_time, mood):
-		frame_with_mouth = self.audio_to_mouth.addMouth(current_frame, frame_time, mood)			
-		return frame_with_mouth
+		frame_with_mouth = self.audio_to_mouth.addMouth(current_frame, frame_time, mood)
+		final_frame = self._writeTextOnImage(frame_with_mouth, mood)		
+		return final_frame
 
-	def _writeTextOnImage(self, img, word, W, H):
+	def _writeTextOnImage(self, img, word):
+		(W, H) = img.size
 		fontsize = 200
 
 		draw = ImageDraw.Draw(img)  
