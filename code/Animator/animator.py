@@ -86,7 +86,6 @@ LAZYKH_IMAGE_INDEXING = {
 	}
 }
 
-
 def parseTrackPathFromArguments():
 	parser = argparse.ArgumentParser(description='Annotated text to Animation')
 	parser.add_argument('--track_path', 

@@ -30,8 +30,9 @@ class AudioToMouth:
 		pillow_mouth = self._phonemeToMouthImagePath(phoneme, mood).convert('RGBA')
 		pillow_empty = Image.new("RGBA",image.size)
 		(w, h) = pillow_mouth.size
+		pillow_mouth = pillow_mouth.resize((w//3, h//3))
 		(W, H) = image.size
-		position = (W//2 - w//2, H//2 - h//2)
+		position = (int(W/2 - (2*47+1)*w/128), int(H/2 - 26*h/32))
 		pillow_empty.paste(pillow_mouth, position,mask=pillow_mouth)
 		image = Image.alpha_composite(image, pillow_empty)
 
