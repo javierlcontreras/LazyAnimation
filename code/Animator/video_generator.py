@@ -7,32 +7,28 @@ import os
 
 
 class VideoGenerator:
-	def __init__(self, track_path, docker_url, ART_PATHS,
-					FPS = 60, WIDTH = 1920, HEIGHT = 1080): 
-		self.FPS = FPS
-		self.WIDTH = WIDTH
-		self.HEIGHT = HEIGHT
-		self.ART_PATHS = ART_PATHS
+	def __init__(self, track_path, docker_url, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING): 
+		self.VIDEO_SETTINGS = VIDEO_SETTINGS
 
-		self.track_path = track_path
-		self.docker_url = docker_url
-
-		annotated_script_parser = AnnotatedScriptParser(self.track_path)
+		annotated_script_parser = AnnotatedScriptParser(track_path)
 		self.track_info = annotated_script_parser.parseAnnotatedScript()
 		annotated_script_parser.unnanotateAndSaveScriptForGentle(self.track_info)
 		
-		self.animation_engine = AnimationEngine(track_path, docker_url, ART_PATHS, FPS, WIDTH, HEIGHT)
+		self.animation_engine = AnimationEngine(track_path, docker_url, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING)
 
 		self.track_audio_path = f"{track_path}.aac"
 		self.output_video_path = f"{track_path}.mp4"
 		self.output_video_audio_path = f"{track_path}_audio.mp4"
 
 	def generateVideo(self):	
+		FPS = self.VIDEO_SETTINGS['FPS']
+		WIDTH = self.VIDEO_SETTINGS['WIDTH']
+		HEIGHT = self.VIDEO_SETTINGS['HEIGHT']
 		fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
 		video = cv2.VideoWriter(self.output_video_path, 
 								fourcc, 
-								self.FPS, 
-								(self.WIDTH, self.HEIGHT))
+								FPS, 
+								(WIDTH, HEIGHT))
 		
 		init_time = 0
 		for track_info_line in tqdm.tqdm(self.track_info):

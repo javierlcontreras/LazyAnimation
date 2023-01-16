@@ -5,14 +5,11 @@ import numpy as np
 from audio_to_mouth import *
 
 class FrameModifier:
-	def __init__(self, track_path, docker_url, ART_PATHS):
-		self.ART_PATHS = ART_PATHS
+	def __init__(self, track_path, docker_url, ART_PATHS, LAZYKH_IMAGE_INDEXING):
+		self.audio_to_mouth = AudioToMouth(track_path, docker_url, ART_PATHS, LAZYKH_IMAGE_INDEXING)
 
-		self.docker_url = docker_url
-		self.audio_to_mouth = AudioToMouth(track_path, docker_url, ART_PATHS)
-
-	def getFrame(self, current_frame, frame_time):
-		frame_with_mouth = self.audio_to_mouth.addMouth(current_frame, frame_time)			
+	def getFrame(self, current_frame, frame_time, mood):
+		frame_with_mouth = self.audio_to_mouth.addMouth(current_frame, frame_time, mood)			
 		return frame_with_mouth
 
 	def _writeTextOnImage(self, img, word, W, H):

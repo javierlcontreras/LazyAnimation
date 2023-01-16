@@ -11,56 +11,12 @@ from pocketsphinx import *
 import requests
 
 
-phoneme2mouth = {
-	"aa": "a",
-	"ae": "a",
-	"ah": "a",
-	"ao": "a",
-	"aw": "au",
-	"ay": "ay",
-	"b": "m",
-	"ch": "t",
-	"d": "t",
-	"dh": "t",
-	"eh": "a",
-	"er": "u",
-	"ey": "ay",
-	"f": "f",
-	"g": "t",
-	"hh": "y",
-	"ih": "a",
-	"iy": "ay",
-	"jh": "t",
-	"k": "t",
-	"l": "y",
-	"m": "m",
-	"n": "t",
-	"ng": "t",
-	"ow": "au",
-	"oy": "ua",
-	"p": "m",
-	"r": "u",
-	"s": "t",
-	"sh": "t",
-	"t": "t",
-	"th": "t",
-	"uh": "u",
-	"uw": "u",
-	"v": "f",
-	"w": "u",
-	"y": "y",
-	"z": "t",
-	"zh": "t",
-	"empty": "m" # For unknown phonemes, the stick figure will just have a closed mouth ("mmm")
-}
-
 class AudioToMouth:
-	def __init__(self, track_path, docker_url, ART_PATHS):
-		self.AVERAGING_WINDOW_SECONDS = 0.3
+	def __init__(self, track_path, docker_url, ART_PATHS, LAZYKH_IMAGE_INDEXING):
 		self.ART_PATHS = ART_PATHS
 		
 		self.docker_url = docker_url
-
+		self.LAZYKH_IMAGE_INDEXING = LAZYKH_IMAGE_INDEXING
 		# self.audio_raw, self.audio_FPS, self.audio_max = self._extractAudioRaw(track_path)
 
 		self.phoneme_list = self._extractPhonemes(track_path)
@@ -96,7 +52,7 @@ class AudioToMouth:
 				self._addPhoneme(phoneme_list, "m", start_time, word_info["start"])
 			start_time = word_info["start"]
 			for phoneme in word_info["phones"]:
-				true_phoneme = phoneme2mouth[phoneme["phone"].split("_")[0]]
+				true_phoneme = self.LAZYKH_IMAGE_INDEXING["PHONEME_TO_MOUTH"][phoneme["phone"].split("_")[0]]
 				if true_phoneme == "sil": true_phoneme = "m"
 				duration = phoneme["duration"]
 				if len(true_phoneme) == 2:
@@ -109,8 +65,14 @@ class AudioToMouth:
 		print(phoneme_list)
 		return phoneme_list
 
-	def _addMouthImage(self, image, phoneme):
-		pillow_mouth = Image.open(f"{self.ART_PATHS['MOUTHS']}/{phoneme}.png").convert('RGBA')
+	def _phonemeToMouthImagePath(self, phoneme, mood):
+		index = self.LAZYKH_IMAGE_INDEXING["MOUTH_TO_INDEX"][phoneme]
+		if self.LAZYKH_IMAGE_INDEXING['EMOTION_POSITIVITY'][mood]:
+			index += 11
+		return Image.open(f"{self.ART_PATHS['MOUTHS']}/mouth" + "{:04d}".format(index + 1) + ".png")
+
+	def _addMouthImage(self, image, mood, phoneme):
+		pillow_mouth = self._phonemeToMouthImagePath(phoneme, mood).convert('RGBA')
 		pillow_empty = Image.new("RGBA",image.size)
 		(W, H) = image.size
 		(w, h) = pillow_mouth.size
@@ -120,7 +82,7 @@ class AudioToMouth:
 
 		return image
 
-	def addMouth(self, image, frame_time):
+	def addMouth(self, image, frame_time, mood):
 		#audio_frame = int(frame_time * self.audio_FPS)
 		
 		if frame_time > self.phoneme_list[self.current_phoneme]['end_time']: 
@@ -129,4 +91,4 @@ class AudioToMouth:
 				self.current_phoneme = len(self.phoneme_list)-1
 
 		phoneme = self.phoneme_list[self.current_phoneme]["phoneme"]
-		return self._addMouthImage(image, phoneme)
+		return self._addMouthImage(image, mood, phoneme)
