@@ -47,7 +47,6 @@ class Scheduler:
 					self._addPhoneme(phoneme_list, true_phoneme, start_time, start_time + duration)
 				start_time += duration
 
-		print(phoneme_list)
 		return phoneme_list
 
 	def _fullAudioDuration(self):
@@ -56,7 +55,6 @@ class Scheduler:
 		return duration
 
 	def _extractTrackLineDuration(self, json):
-		print(json)
 		durations = []
 		json_index = 0
 		last_duration = 0
@@ -73,7 +71,6 @@ class Scheduler:
 		full_audio_duration = self._fullAudioDuration()
 		durations.append(full_audio_duration - last_duration)
 
-		print(durations)
 		return durations
 
 	def getTimetables(self):

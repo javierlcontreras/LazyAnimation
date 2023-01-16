@@ -42,6 +42,8 @@ class VideoGenerator:
 		WIDTH = self.VIDEO_SETTINGS['WIDTH']
 		HEIGHT = self.VIDEO_SETTINGS['HEIGHT']
 
+		print(FPS, WIDTH, HEIGHT)
+
 		fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
 		video = cv2.VideoWriter(self.output_video_path, 
 								fourcc, 
@@ -54,7 +56,7 @@ class VideoGenerator:
 			init_time += delta_time
 
 		video.release()
-		#self.addMusic()
+		self.addMusic()
 
 	def addMusic(self):
 		os.system(f"ffmpeg -i {self.output_video_path} -i {self.audio_track_path} \

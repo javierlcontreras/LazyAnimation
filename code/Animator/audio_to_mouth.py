@@ -9,7 +9,6 @@ from PIL import ImageFont, ImageDraw, Image
 
 import requests
 
-
 class AudioToMouth:
 	def __init__(self, track_path, docker_url, schedule, ART_PATHS, LAZYKH_IMAGE_INDEXING):
 		self.ART_PATHS = ART_PATHS
@@ -30,8 +29,8 @@ class AudioToMouth:
 	def _addMouthImage(self, image, mood, phoneme):
 		pillow_mouth = self._phonemeToMouthImagePath(phoneme, mood).convert('RGBA')
 		pillow_empty = Image.new("RGBA",image.size)
-		(W, H) = image.size
 		(w, h) = pillow_mouth.size
+		(W, H) = image.size
 		position = (W//2 - w//2, H//2 - h//2)
 		pillow_empty.paste(pillow_mouth, position,mask=pillow_mouth)
 		image = Image.alpha_composite(image, pillow_empty)
