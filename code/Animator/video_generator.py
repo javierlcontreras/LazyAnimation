@@ -48,9 +48,11 @@ class VideoGenerator:
 								fourcc, 
 								FPS, 
 								(WIDTH, HEIGHT))
-		for frame_info in tqdm.tqdm(schedule):
+		for frame_it, frame_info in enumerate(tqdm.tqdm(schedule)):
 			frame = animation_engine.getFrame(frame_info)
 			(W, H) = frame.size
+			if frame_it == 0:
+				frame.show()
 			if W != WIDTH or H != HEIGHT:
 				raise "Recieving frame of inadecuate size for video"
 			cv2_frame= cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)  

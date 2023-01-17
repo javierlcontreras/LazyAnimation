@@ -81,12 +81,12 @@ class Scheduler:
 
 		return durations
 
-	def _newFrame(self, track_line, phoneme):
+	def _newFrame(self, track_line, phoneme, blinker):
 		return {
 			"phoneme": phoneme,
 			"mood": track_line["mood"],
 			"pose": 0,
-			"blinker": 0
+			"blinker": blinker
 		}
 
 	def _frameBriefing(self, phoneme_list, track_durations):
@@ -99,7 +99,27 @@ class Scheduler:
 		phoneme_it = 0
 		track_it = 0
 		current_duration = track_durations[0]
+
+		blinking_space_frames = int(self.VIDEO_SETTINGS["BLINKING_SPACE_TIME"] * FPS)
+		blinking_action_frames = int(self.VIDEO_SETTINGS["BLINKING_ACTION_TIME"] * FPS)
+
+		frames_to_blink = blinking_space_frames
+		blinking_stage = 1e9
+		blinker = 0
 		for frame_it in range(total_frames):
+			### BLINKING
+			frames_to_blink -= 1
+			blinking_stage += 1
+			if frames_to_blink == 0:
+				blinking_stage = 0
+				blinker = 1
+			if blinking_stage == blinking_action_frames:
+				blinker = 2
+			if blinking_stage == 2*blinking_action_frames:
+				blinker = 0
+				frames_to_blink = blinking_space_frames
+			### /BLINKING
+
 			frame_time = frame_it / FPS
 			if frame_time >= phoneme_list[phoneme_it]["end_time"]: 
 				phoneme_it += 1
@@ -113,7 +133,7 @@ class Scheduler:
 			
 			if track_it >= len(track_durations):
 				print("track_it ", track_it)
-			frame_info.append(self._newFrame(self.track_info[track_it], phoneme_list[phoneme_it]["phoneme"]))
+			frame_info.append(self._newFrame(self.track_info[track_it], phoneme_list[phoneme_it]["phoneme"], blinker))
 		return frame_info
 
 	def getTimetables(self):

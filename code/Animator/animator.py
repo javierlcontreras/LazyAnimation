@@ -6,14 +6,15 @@ import requests
 ART_PATHS = {
 	"POSES": "art/poses",
 	"FONTS": "art/fonts",
-	"MOUTHS": "art/mouths"
+	"MOUTHS": "art/mouths",
+	"EYES": "art/eyes"
 }
 
 VIDEO_SETTINGS = {
-	"FPS": 100,
+	"FPS": 24,
 	"WIDTH": 1920,
 	"HEIGHT": 1080,
-	"BLINKING_SPACE_TIME": 1.5,
+	"BLINKING_SPACE_TIME": 3,
 	"BLINKING_ACTION_TIME": 0.1
 }
 

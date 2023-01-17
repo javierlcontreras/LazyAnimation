@@ -1,17 +1,18 @@
-from audio_to_mouth import *
+from human_drawer import *
 import random
 import tqdm
 import glob 
+
 class AnimationEngine:
 	def __init__(self, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING):
 		self.ART_PATHS = ART_PATHS
 		self.VIDEO_SETTINGS = VIDEO_SETTINGS
 		self.LAZYKH_IMAGE_INDEXING = LAZYKH_IMAGE_INDEXING
 
-		self.audio_to_mouth = AudioToMouth(ART_PATHS, LAZYKH_IMAGE_INDEXING)
+		self.human_drawer = HumanDrawer(ART_PATHS, LAZYKH_IMAGE_INDEXING)
 
 	def _emotionToImagePath(self, mood, pose, blinker):
-		index = (5*self.LAZYKH_IMAGE_INDEXING["EMOTION_INDEX"][mood] + pose)*3 + blinker
+		#index = (5*self.LAZYKH_IMAGE_INDEXING["EMOTION_INDEX"][mood] + pose)*3 + blinker
 		try:
 			path = glob.glob(f"{self.ART_PATHS['POSES']}/pose*")[0]# + "{:04d}".format(index + 1) + ".png")[0]
 		except IndexError as e:
@@ -23,12 +24,13 @@ class AnimationEngine:
 	def getFrame(self, frame_info):
 		pose_path = self._emotionToImagePath(frame_info["mood"], frame_info["pose"], frame_info["blinker"]) 
 		pose_image = Image.open(pose_path)
-		#WIDTH = self.VIDEO_SETTINGS["WIDTH"]		
-		#HEIGHT = self.VIDEO_SETTINGS["HEIGHT"]		
-		#pose_image_resized = self._imageResize(pose_image, WIDTH, HEIGHT)
 
-		frame_with_mouth = self.audio_to_mouth.addMouth(pose_image, frame_info)
-		return frame_with_mouth
+		frame_with_mouth = self.human_drawer.addMouth(pose_image, frame_info)
+		frame_with_eyes = self.human_drawer.addEyes(frame_with_mouth, frame_info)
+		WIDTH = self.VIDEO_SETTINGS["WIDTH"]		
+		HEIGHT = self.VIDEO_SETTINGS["HEIGHT"]		
+		frame_resized = self._imageResize(frame_with_eyes, WIDTH, HEIGHT)
+		return frame_resized
 
 	def _writeTextOnImage(self, img, word):
 		(W, H) = img.size
