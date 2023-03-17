@@ -3,6 +3,8 @@ import random
 import tqdm
 import glob 
 
+from PIL import ImageFont, ImageDraw, Image
+
 class AnimationEngine:
 	def __init__(self, ART_PATHS, VIDEO_SETTINGS, LAZYKH_IMAGE_INDEXING):
 		self.ART_PATHS = ART_PATHS
@@ -14,7 +16,7 @@ class AnimationEngine:
 	def _emotionToImagePath(self, mood, pose, blinker):
 		#index = (5*self.LAZYKH_IMAGE_INDEXING["EMOTION_INDEX"][mood] + pose)*3 + blinker
 		try:
-			path = glob.glob(f"{self.ART_PATHS['POSES']}/pose*")[0]# + "{:04d}".format(index + 1) + ".png")[0]
+			path = glob.glob(f"{self.ART_PATHS['POSES']}/{mood}*")[0]# + "{:04d}".format(index + 1) + ".png")[0]
 		except IndexError as e:
 			print(f"Invalid mood {mood}, no images found")
 			raise e
@@ -67,7 +69,7 @@ class AnimationEngine:
 		
 		sheight = int(sheight)
 		swidth = int(swidth)
-		img = img.resize((swidth, sheight))
+		img = img.resize((swidth, sheight), resample=Image.Resampling.NEAREST)
 		
 		pil_back = Image.new("RGBA", (W,H))
 		dx = W//2 - swidth//2

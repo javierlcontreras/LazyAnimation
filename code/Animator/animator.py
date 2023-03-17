@@ -11,11 +11,12 @@ ART_PATHS = {
 }
 
 VIDEO_SETTINGS = {
-	"FPS": 24,
-	"WIDTH": 1920,
-	"HEIGHT": 1080,
+	"FPS": 50,
+	"WIDTH": 2560,
+	"HEIGHT": 2560,
 	"BLINKING_SPACE_TIME": 3,
-	"BLINKING_ACTION_TIME": 0.1
+	"BLINKING_ACTION_TIME": 0.1,
+	"POSE_TIME": 1.5
 }
 
 LAZYKH_IMAGE_INDEXING = {
@@ -75,7 +76,8 @@ LAZYKH_IMAGE_INDEXING = {
 		"y": "y",
 		"z": "t",
 		"zh": "t",
-		"empty": "m" # For unknown phonemes, the stick figure will just have a closed mouth ("mmm")
+		"empty": "m", # For unknown phonemes, the stick figure will just have a closed mouth ("mmm")
+		"oov": "m"
 	},
 	'MOUTH_TO_INDEX': {
 		'y': 0, 
@@ -105,11 +107,11 @@ def parseTrackPathFromArguments():
 	docker_url = f"http://0.0.0.0:{docker_port}/transcriptions"
 
 
-	if not os.path.exists(f"{track_path }.txt"):
-		raise "track_path.txt doesn't exist"
+	if not os.path.exists(f"{track_path}.txt"):
+		raise "<track_path>.txt doesn't exist"
 
 	if not os.path.exists(f"{track_path}.aac"):
-		raise "track_path.acc doesn't exist"
+		raise "<track_path>.acc doesn't exist"
 
 	try:
 		head = requests.get(docker_url)

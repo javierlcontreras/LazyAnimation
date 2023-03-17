@@ -34,7 +34,7 @@ class AnnotatedScriptParser:
 			track_line = track_line.strip(" ")
 			err = self._validTrackLine(track_line)
 			if err != "":
-				print(f"Invalid line {track_line} with error {err}, skipping it")
+				print(f"-----DEBUG INFO: Invalid line {track_line} with error {err}, skipping it")
 				print("Valid format is {text}[mood]")
 				continue
 			track_line_info = self._parseTrackLineInfo(track_line)
