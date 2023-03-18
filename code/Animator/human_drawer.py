@@ -29,8 +29,10 @@ class HumanDrawer:
 
     def draw(self, hands, mouth, eyes, eyebrows):
         body_path = ART_PATHS["BODY_IMAGE"]
-        image = Image.open(body_path)
+        body = Image.open(body_path)
+        image = Image.new('RGBA', body.size, (0, 0, 0, 0))
 
+        image = self._addImage(image, body)
         image = self._addPart(image, ART_PATHS["FACE_IMAGE"])
         image = self._addPart(image, ART_PATHS["HANDS"] + "/" + hands + ".png")
         image = self._addPart(image, ART_PATHS["MOUTHS"] + "/" + mouth + ".png")

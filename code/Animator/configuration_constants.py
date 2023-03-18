@@ -18,19 +18,19 @@ INPUT_AUDIO_TYPE = "aac"
 OUTPUT_VIDEO_TYPE = "mp4"
 
 TRACK_PATH_FILES = {
-    "ANNOTATED_TRANSCRIPT": ".txt",
-    "AUDIO": f".{INPUT_AUDIO_TYPE}",
-    "TRANSCRIPT": "_gentle.txt",
-    "PHONEME_LIST": "_phonemes.json",
-    "PHONEME_LIST_REVIEWED": "_phonemes_reviewed.json",
-    "VIDEO": f".{OUTPUT_VIDEO_TYPE}",
-    "VIDEO_WITH_AUDIO": f"_audio.{OUTPUT_VIDEO_TYPE}",
+    "FRAMES": "frames",
+    "ANNOTATED_TRANSCRIPT": "annotated_transcript.txt",
+    "AUDIO": f"audio.{INPUT_AUDIO_TYPE}",
+    "TRANSCRIPT": "transcript.txt",
+    "PHONEMES": "phonemes.json",
+    "PHONEMES_REVIEWED": "phonemes_reviewed.json",
+    "VIDEO": f"video.{OUTPUT_VIDEO_TYPE}",
 }
 
 VIDEO_SETTINGS = {
-    "FPS": 24,
-    "WIDTH": 2560,
-    "HEIGHT": 2560,
+    "FPS": 12,
+    "WIDTH": 256*5,
+    "HEIGHT": 256*5,
     "BLINKING_SPACE_TIME": 3,
     "BLINKING_ACTION_TIME": 0.1,
     "POSE_TIME": 1.5

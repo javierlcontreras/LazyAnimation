@@ -86,7 +86,7 @@ class PhonemePredictor:
         self._addPhoneme("sil", start_time, self._fullAudioDuration())
 
     def _fullAudioDuration(self):
-        sound = AudioSegment.from_file(f"{self.track_path}{TRACK_PATH_FILES['AUDIO']}", INPUT_AUDIO_TYPE)
+        sound = AudioSegment.from_file(f"{self.track_path}/{TRACK_PATH_FILES['AUDIO']}", INPUT_AUDIO_TYPE)
         duration = sound.duration_seconds
         return duration
 
@@ -102,5 +102,5 @@ class PhonemePredictor:
         gentle_json = self._requestHTTPGentle()
         self._extractPhonemeTimetable(gentle_json)
 
-        out_file = open(f"{self.track_path}{TRACK_PATH_FILES['PHONEME_LIST']}", "w")
+        out_file = open(f"{self.track_path}/{TRACK_PATH_FILES['PHONEMES']}", "w")
         json.dump(self.word_list, out_file, indent=1)

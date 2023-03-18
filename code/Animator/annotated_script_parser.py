@@ -1,4 +1,4 @@
-from configuration_constants import ART_PATHS
+from configuration_constants import ART_PATHS, TRACK_PATH_FILES
 from PIL import Image
 
 
@@ -39,7 +39,7 @@ class AnnotatedScriptParser:
 
     def parseAnnotatedScript(self):
         track_raw = []
-        with open(f"{self.track_path}.txt", "r") as reader:
+        with open(f"{self.track_path}/{TRACK_PATH_FILES['ANNOTATED_TRANSCRIPT']}", "r") as reader:
             track_raw = reader.read()
 
         track_info = []

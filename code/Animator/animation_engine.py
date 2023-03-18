@@ -50,14 +50,14 @@ class AnimationEngine:
         h, w = img.size
 
         back = np.zeros((H, W, 3), dtype="uint8")
-
+        if w == W and h == H: return img
         if w / W > h / H:
             swidth = W
             sheight = h * W / w
         else:
             sheight = H
             swidth = w * H / h
-
+        
         sheight = int(sheight)
         swidth = int(swidth)
         img = img.resize((swidth, sheight), resample=Image.Resampling.NEAREST)

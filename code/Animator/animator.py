@@ -28,10 +28,10 @@ def parseTrackPathFromArguments():
 
     if execution_mode not in VALID_EXECUTION_MODES:
         raise "Invalid Execution mode"
-    if not os.path.exists(f"{track_path}.txt"):
-        raise "<track_path>.txt doesn't exist"
-    if not os.path.exists(f"{track_path}.aac"):
-        raise "<track_path>.acc doesn't exist"
+    if not os.path.exists(f"{track_path}/{TRACK_PATH_FILES['ANNOTATED_TRANSCRIPT']}"):
+        raise "Annotated transcript doesn't exist"
+    if not os.path.exists(f"{track_path}/{TRACK_PATH_FILES['AUDIO']}"):
+        raise "Audio doesn't exist"
     
     if execution_mode == TO_GENTLE_MODE:
         docker_port = args.docker_port

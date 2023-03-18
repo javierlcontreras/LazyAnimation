@@ -90,20 +90,19 @@ class Scheduler:
         for frame_it, frame in enumerate(frames):
             frame_time = frame_it / FPS
             if word_it > len(gentle_json): break
-            word_phoneme_list = gentle_json[word_it]["phonemes"]
-            phoneme = word_phoneme_list[phoneme_it]
-            if frame_time >= phoneme["end_time"]:
+
+            while frame_time >= gentle_json[word_it]["phonemes"][phoneme_it]["end_time"]:
                 phoneme_it += 1
-                if phoneme_it >= len(word_phoneme_list):
+                if phoneme_it >= len(gentle_json[word_it]["phonemes"]):
                     phoneme_it = 0
                     word_it += 1
 
-            frame["mouth"] = phoneme["mouth"]
+            frame["mouth"] = gentle_json[word_it]["phonemes"][phoneme_it]["mouth"]
 
     def _cleanUpInput(self):
         script_parser = AnnotatedScriptParser(self.track_path)
         track_info = script_parser.parseAnnotatedScript()
-        gentle_json = json.load(open(f"{self.track_path}{TRACK_PATH_FILES['PHONEME_LIST_REVIEWED']}"))
+        gentle_json = json.load(open(f"{self.track_path}/{TRACK_PATH_FILES['PHONEMES_REVIEWED']}"))
         self._injectTrackLineDuration(track_info, gentle_json)
         print(track_info)
         return gentle_json, track_info, self._fullAudioDuration(gentle_json)

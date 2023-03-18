@@ -9,13 +9,10 @@ import os
 
 from configuration_constants import TRACK_PATH_FILES, VIDEO_SETTINGS, ART_PATHS
 
+
 class VideoGenerator:
     def __init__(self, track_path):
         self.track_path = track_path
-
-        self.audio_track_path = f"{track_path}{TRACK_PATH_FILES['AUDIO']}"
-        self.output_video_path = f"{track_path}{TRACK_PATH_FILES['VIDEO']}"
-        self.output_video_audio_path = f"{track_path}{TRACK_PATH_FILES['VIDEO_WITH_AUDIO']}"
 
     def _computeSchedule(self):
         scheduler = Scheduler(self.track_path)
@@ -33,24 +30,27 @@ class VideoGenerator:
 
         print(FPS, WIDTH, HEIGHT)
 
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        video = cv2.VideoWriter(self.output_video_path,
-                                fourcc,
-                                FPS,
-                                (WIDTH, HEIGHT))
+        frame_folder = f"{self.track_path}/{TRACK_PATH_FILES['FRAMES']}"
+        if not os.path.exists(frame_folder):
+            os.mkdir(frame_folder)
+
         for frame_it, frame_info in enumerate(tqdm.tqdm(schedule)):
+            frame_file = f"{frame_folder}/frame-{frame_it:06d}.png"
+            print(frame_file)
+            if os.path.exists(frame_file):
+                continue
             frame = animation_engine.getFrame(frame_info)
             (W, H) = frame.size
             if frame_it == 0:
                 frame.show()
             if W != WIDTH or H != HEIGHT:
                 raise "Receiving frame of inadequate size for video"
-            cv2_frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
-            video.write(cv2_frame)
+            frame.save(frame_file, "png")
 
-        video.release()
-        self.addMusic()
+        self.createVideo()
 
-    def addMusic(self):
-        os.system(f"ffmpeg -i {self.output_video_path} -i {self.audio_track_path} \
-			-c copy -map 0:v -map 1:a -c:v copy -shortest -y {self.output_video_audio_path}")
+    def createVideo(self):
+        os.system(f"ffmpeg -framerate {VIDEO_SETTINGS['FPS']} \
+                    -pattern_type glob -i '{self.track_path}/{TRACK_PATH_FILES['FRAMES']}/*.png' \
+                    -i {self.track_path}/{TRACK_PATH_FILES['AUDIO']} \
+                    -c:v png -pix_fmt +rgba {self.track_path}/{TRACK_PATH_FILES['VIDEO']} -y")
