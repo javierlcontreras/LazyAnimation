@@ -1,26 +1,35 @@
+from configuration_constants import ART_PATHS
+from PIL import Image
+
+
 def _parseTrackLineInfo(track_line):
-    parts = track_line.split("}")
-    text = parts[0][1:]
-    tags = parts[1][1:-1].strip(" ")
+    parts = track_line.split("]")
+    tags = parts[0][1:].strip(" ")
+    text = parts[1].strip(" ")
+    
+    hands, eyebrows = "down", "happy"
     if "," in tags:
-        pose, mood = tags.split(",")
+        hands, eyebrows = tags.split(",")
+        hands = hands.strip(" ")
+        eyebrows = eyebrows.strip(" ")
     else:
-        pose = tags
-        mood = "happy"
-    return {"text": text, "pose": pose, "mood": mood}
+        hands = tags
+
+    try:
+        Image.open(ART_PATHS["HANDS"] + "/" + hands + ".png")
+        Image.open(ART_PATHS["EYEBROWS"] + "/" + eyebrows + ".png")
+    except FileNotFoundError:
+        raise "using non-existing tags!"
+    return {"text": text, "hands": hands, "eyebrows": eyebrows}
 
 
 def _validTrackLine(track_line):
     print(track_line)
-    if track_line.count("{") != 1: return ">{"
-    if track_line.count("}") != 1: return ">}"
     if track_line.count("[") != 1: return ">["
     if track_line.count("]") != 1: return ">]"
-    parts = track_line.split("}")
-    if parts[0].count("{") != 1 or parts[0][0] != "{": return "{ incorrect in part 1"
-    if parts[1].count("[") != 1 or parts[1][0] != "[": return "[ incorrect in part 2"
-    if parts[1].count("]") != 1 or parts[1][-1] != "]": return "] incorrect in part 2"
-    if parts[1].count(",") >= 2: return "too many tags, max is 2"
+    parts = track_line.split("]")
+    if parts[0].count("[") != 1 or parts[0][0] != "[": return "[ incorrect in part 1"
+    if parts[0].count(",") >= 2: return "too many tags, max is 2"
     return ""
 
 
@@ -39,6 +48,7 @@ class AnnotatedScriptParser:
             track_lines = track_lines[:-1]
         for track_line in track_lines:
             track_line = track_line.strip(" ")
+            if track_line == "": continue
             err = _validTrackLine(track_line)
             if err != "":
                 print(f"-----DEBUG INFO: Invalid line {track_line} with error {err}, skipping it")
